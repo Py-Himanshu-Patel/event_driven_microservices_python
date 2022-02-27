@@ -1,0 +1,28 @@
+version: '3.8'                  # give any version number > 3
+services:                       # define all services or containers we need to run using this docker compose
+
+  backend:                      # one service/container is backend
+    build:                      # build docker container from image or dockerfile
+      context: .                # path to dockerfile
+      dockerfile: Dockerfile    # name of dockerfile
+    ports:
+      - 8001:5000               # hostport : container port
+    volumes:
+      - .:/app                  # map the code from host to container
+    command: python main.py
+    depends_on:
+      - db
+   
+  db:
+    image: mysql:8         # choose mysql image version
+    restart: always             # restart the container if stopped
+    command: --default-authentication-plugin=mysql_native_password  # to enable password authentication
+    environment:
+      MYSQL_DATABASE: main    
+      # MYSQL_USER: root
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - .dbdata:/var/lib/mysql  # map the data from host to container
+    ports:
+      - 33067:3306              # choose some other port on host, prevent confict with local mysql

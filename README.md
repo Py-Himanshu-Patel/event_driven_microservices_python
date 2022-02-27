@@ -56,3 +56,35 @@ drwxrwxr-x. 3 himanshu         himanshu         4096 Feb 26 11:02 admin/
 -rw-rw-r--. 1 himanshu         himanshu          144 Feb 24 03:01 Dockerfile
 drwxr-xr-x. 4 himanshu         himanshu         4096 Feb 26 16:08 products/
 ```
+
+- While creating `main` app the Dockerfile is same as it was in `admin` app. But compose file need updates like changing of ports.
+
+- Some of the packages used in `main` are not supported now so the issue comes in makeing migrations of flask models. Use exact requirements.txt
+
+- After starting `docker-compose` for `main` app. Enter into backend service container and execute below command to make migrations and apply them to database service.
+```bash
+root@069dc17d198d:/app# python manager.py db init
+  Creating directory /app/migrations ...  done
+  Creating directory /app/migrations/versions ...  done
+  Generating /app/migrations/README ...  done
+  Generating /app/migrations/alembic.ini ...  done
+  Generating /app/migrations/script.py.mako ...  done
+  Generating /app/migrations/env.py ...  done
+  Please edit configuration/connection/logging settings in '/app/migrations/alembic.ini'
+  before proceeding.
+root@069dc17d198d:/app# python manager.py db migrate
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.autogenerate.compare] Detected added table 'product'
+INFO  [alembic.autogenerate.compare] Detected added table 'product_user'
+  Generating /app/migrations/versions/f48cea754e19_.py ...  done
+root@069dc17d198d:/app# python manager.py db upgrade
+INFO  [alembic.runtime.migration] Context impl MySQLImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> f48cea754e19, empty message
+```
+
+- To run a rabbitmq container
+```bash
+$ docker run -d --hostname rabbitmq-host --name rabbitmq -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin -p 5672:5672 -p 15672:15672 rabbitmq:3.9-management
+```
