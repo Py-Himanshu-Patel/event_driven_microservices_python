@@ -85,6 +85,25 @@ INFO  [alembic.runtime.migration] Running upgrade  -> f48cea754e19, empty messag
 ```
 
 - To run a rabbitmq container
+Create a network for to which rabbitmq container can be attached.
 ```bash
-$ docker run -d --hostname rabbitmq-host --name rabbitmq -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin -p 5672:5672 -p 15672:15672 rabbitmq:3.9-management
+$ docker network create rabbitmq_network
+40ffe55bf076ed16f102efdc6de398cffd69e2052579f12aa2ccf06fad33ec41
+$ docker network ls
+NETWORK ID     NAME               DRIVER    SCOPE
+b583128f4fa1   admin_default      bridge    local
+4654075b5176   bridge             bridge    local
+cc30fcb154e5   host               host      local
+61225df90f5a   main_default       bridge    local
+a719b9b7a55c   none               null      local
+40ffe55bf076   rabbitmq_network   bridge    local
 ```
+We do have `main_default` and `admin_default` network which got created with docker compose of `main` and `admin` app. But we can't connect rabbitmq container to two network at a time so we have to create a seperaete network for connecting all three.
+```bash
+$ docker run -d --hostname rabbitmq-host --name rabbitmq --network rabbitmq_network -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin -p 5672:5672 -p 15672:15672 rabbitmq:3.9-management
+```
+We need to attach rabbitmq container to same network bridge in which container which is requesting for connection is present. Then the container making request can directly mention host as `rabbitmq` (name of rabbitmq container).
+
+Update the `docker-compose` files of **admin** and **main** app as well. So that they connect to `rabbitmq_network`.
+
+For more refer: https://docs.docker.com/compose/networking/

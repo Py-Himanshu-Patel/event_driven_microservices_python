@@ -8,21 +8,42 @@ services:                       # define all services or containers we need to r
     ports:
       - 8000:8000               # hostport : container port
     volumes:
-      - .:/app                  # map the code from host to container
-    command: python manage.py runserver 0.0.0.0:8000
+      - .:/src                  # map the code from host to container
+    command: 'python manage.py runserver 0.0.0.0:8000'
+    networks:
+      - rabbitmq
+      - default
     depends_on:
       - db
-   
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "python -u consumer.py"
+    depends_on:
+      - backend
+      - db
+    networks:
+      - rabbitmq
+
   db:
-    image: mysql:8         # choose mysql image version
+    image: mysql:8              # choose mysql image version
     restart: always             # restart the container if stopped
     command: --default-authentication-plugin=mysql_native_password  # to enable password authentication
     environment:
-      MYSQL_DATABASE: admin     
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      MYSQL_DATABASE: admin
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - .dbdata:/var/lib/mysql  # map the data from host to container
     ports:
       - 33066:3306              # choose some other port on host, prevent confict with local mysql
+    networks:
+      - default
+
+networks:
+  rabbitmq:
+    external:
+      name: rabbitmq_network
+  default:
+    name: admin_default
