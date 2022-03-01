@@ -21,11 +21,15 @@ services:                       # define all services or containers we need to r
       context: .
       dockerfile: Dockerfile
     command: "python -u consumer.py"
+    restart: on-failure
+    volumes:
+      - .:/src                  # map the code from host to container
     depends_on:
       - backend
       - db
     networks:
-      - rabbitmq
+      - rabbitmq                # because 
+      - default
 
   db:
     image: mysql:8              # choose mysql image version

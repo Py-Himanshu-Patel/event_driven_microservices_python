@@ -46,7 +46,7 @@ class ProductViewSet(viewsets.ViewSet):
 			return Response({},status=status.HTTP_404_NOT_FOUND)
 		product = product.first()
 		product.delete()
-		publish('product_deleted', pk)
+		publish('product_deleted', {"pk": pk})
 		return Response({"delete_product": pk}, status=status.HTTP_204_NO_CONTENT)		
 
 

@@ -9,11 +9,11 @@ params = pika.ConnectionParameters(host="rabbitmq", port=5672, credentials=crede
 connection = pika.BlockingConnection(params)
 channel = connection.channel()
 
-def publish(method, body):
-	properties = pika.BasicProperties(method)
+
+def publish(action, body):
+	body['action'] = action
 	channel.basic_publish(
 		exchange='', 
 		routing_key='main', 
-		body=json.dumps(body),
-		properties=properties
+		body=json.dumps(body)
 	)
