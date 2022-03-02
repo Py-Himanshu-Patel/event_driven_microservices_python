@@ -18,7 +18,9 @@ channel.queue_declare(queue='admin')
 
 def callback(ch, method, properties, body):
 	print('Received in admin')
-	id = json.loads(body)
+	body = json.loads(body)
+	print(body)
+	id = body.get('id')
 	product = Product.objects.filter(id=id)
 	if not product.exists():
 		print(f"Product do not exist {id}")

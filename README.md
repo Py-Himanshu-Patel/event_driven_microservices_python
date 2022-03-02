@@ -107,3 +107,20 @@ We need to attach rabbitmq container to same network bridge in which container w
 Update the `docker-compose` files of **admin** and **main** app as well. So that they connect to `rabbitmq_network`.
 
 For more refer: https://docs.docker.com/compose/networking/
+
+- For API call to happen between `admin` and `main` app. We should have both services on same network and hostname of these services should not have `_` in name like `admin_app` (as django do not recognize them as host).
+
+```bash
+# create a network
+docker network create product_level_network
+# attach it to both the services
+docker network connect product_level_network main_backend_1
+docker network connect product_level_network admin_backend_1
+# now these services can communicate with each other try by curl command from one container to another
+# use host name of another container 
+```
+
+- For connecton of main app to admin app. We assigned a hostname to admin app and use to refer the admin app API.
+```bash
+http://adminApp:8000/api/user'
+```

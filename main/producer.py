@@ -9,11 +9,10 @@ params = pika.ConnectionParameters(
 connection = pika.BlockingConnection(params)
 channel = connection.channel()
 
-def publish(method, body):
-	properties = pika.BaseConnection(method)
+def publish(action, body):
+	body['action'] = action
 	channel.basic_publish(
 		exchange='', 
 		routing_key='admin',
-		body=json.dumps(body),
-		properties=properties
+		body=json.dumps(body)
 		)

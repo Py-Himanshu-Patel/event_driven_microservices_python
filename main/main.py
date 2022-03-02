@@ -39,7 +39,7 @@ def index():
 
 @app.route('/api/products/<int:id>/like', methods=['POST'])
 def like(id):
-    req = requests.get('http://docker.for.mac.localhost:8000/api/user')     # TODO: update this link
+    req = requests.get('http://adminApp:8000/api/user')
     json = req.json()
 
     try:
@@ -47,17 +47,16 @@ def like(id):
         db.session.add(productUser)
         db.session.commit()
 
-        publish('product_liked', id)
-    except:
+        publish('product_liked', {"id": id})
+    except Exception as ex:
+        print(ex.with_traceback())
         abort(400, 'You already liked this product')
 
     return jsonify({
-        'message': 'success'
+        'message': 'success',
+        'like_id': id
     })
 
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
-
-if __name__ == "__main__":
-	app.run(debug=True, host="0.0.0.0")

@@ -10,6 +10,7 @@ services:                       # define all services or containers we need to r
     volumes:
       - .:/src                  # map the code from host to container
     command: 'python main.py'
+    hostname: "mainApp"
     depends_on:
       - db
     networks:
